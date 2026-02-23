@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { OptionSelectorComponent } from './components/option-selector/option-selector.component';
+import { BoxesListComponent } from './components/boxes-list/boxes-list.component';
+import { ClearButtonComponent } from './components/clear-button/clear-button.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [BoxesListComponent, ClearButtonComponent, OptionSelectorComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
-export class App {
-  protected readonly title = signal('rxjs');
-}
+export class App {}

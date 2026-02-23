@@ -1,0 +1,27 @@
+@let selectedBoxId = selectedBoxId$ | async;
+@let options = options$ | async;
+@let selectionHistory = selectionHistory$ | async;
+
+@if (selectedBoxId !== null && selectionHistory) {
+  @let selectedOption = selectionHistory[selectedBoxId]?.id ?? null;
+  <div class="w-full grid grid-cols-4 gap-4">
+    @for (option of options; track option.id) {
+      <button
+        (click)="onOptionSelect(option)"
+        [class]="
+          'px-4 py-2 flex flex-col justify-center items-center rounded-lg cursor-pointer ' +
+          (selectedOption === option.id
+            ? ' bg-violet-100 border-2 border-violet-300'
+            : ' border-gray-300 hover:bg-gray-200 border')
+        "
+      >
+        <span>{{ option.label }}</span>
+        <span class="font-bold">${{ option.value }}</span>
+      </button>
+    }
+  </div>
+} @else {
+  <div class="flex justify-center items-center w-full h-full">
+    <p class="text-lg font-semibold">No Box Selected</p>
+  </div>
+}
