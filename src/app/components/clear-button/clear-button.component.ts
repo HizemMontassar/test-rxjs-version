@@ -16,7 +16,7 @@ export class ClearButtonComponent {
   private readonly el = inject(ElementRef<HTMLElement>);
   private readonly destroyRef = inject(DestroyRef);
 
-  totalPrice$: Observable<number> = new Observable();
+  totalPrice$!: Observable<number>;
 
   ngOnInit() {
     this.totalPrice$ = this.boxSelectionService.totalPrice$;

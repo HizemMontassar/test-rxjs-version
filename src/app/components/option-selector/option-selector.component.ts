@@ -16,9 +16,9 @@ export class OptionSelectorComponent {
   private readonly boxSelectionService = inject(BoxSelectionService);
   private readonly destroyRef = inject(DestroyRef);
 
-  selectedBoxId$: Observable<number | null> = new Observable();
-  options$: Observable<Option[]> = new Observable();
-  selectionHistory$: Observable<Record<number, Option | null>> = new Observable();
+  selectedBoxId$!: Observable<number | null>;
+  options$!: Observable<Option[]>;
+  selectionHistory$!: Observable<Record<number, Option | null>>;
   private readonly optionSelectClick$ = new Subject<Option>();
 
   ngOnInit() {

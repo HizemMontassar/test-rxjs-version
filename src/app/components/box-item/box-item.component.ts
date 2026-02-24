@@ -27,8 +27,8 @@ export class BoxItemComponent implements OnInit {
 
   @Input({ required: true }) boxId!: number;
 
-  isBoxSelected$: Observable<boolean> = new Observable();
-  selectedOption$: Observable<Option | null> = new Observable();
+  isBoxSelected$!: Observable<boolean>;
+  selectedOption$!: Observable<Option | null>;
 
   ngOnInit() {
     this.isBoxSelected$ = this.boxSelectionService.isBoxSelected(this.boxId);
