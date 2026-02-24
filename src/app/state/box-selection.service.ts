@@ -3,19 +3,13 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { Option, SelectionsMap } from '../models/option.model';
 import { OPTION_LIST } from '../data/options.data';
 
-const saveToStorage = (selections: SelectionsMap, totalPrice: number) => {
+const saveToStorage = (selections: SelectionsMap) => {
   localStorage.setItem('selection-history', JSON.stringify(selections));
-  localStorage.setItem('total-price', totalPrice.toString());
 };
 
 const loadHistoryFromStorage = () => {
   const storedHistory = localStorage.getItem('selection-history');
   return storedHistory ? (JSON.parse(storedHistory) as SelectionsMap) : {};
-};
-
-const loadTotalPriceFromStorage = () => {
-  const storedPrice = localStorage.getItem('total-price');
-  return storedPrice ? parseFloat(storedPrice) : 0;
 };
 
 export const BOX_COUNT = 10;
@@ -27,12 +21,17 @@ export class BoxSelectionService {
   private readonly _selectedBoxId$ = new BehaviorSubject<number | null>(null);
   private readonly _selectionHistory = new BehaviorSubject<SelectionsMap>(loadHistoryFromStorage());
   private readonly options = new BehaviorSubject<Option[]>(OPTION_LIST);
-  private readonly _totalPrice$ = new BehaviorSubject<number>(loadTotalPriceFromStorage());
+  private readonly _totalPrice$ = new BehaviorSubject<number>(0);
 
   readonly selectedBoxId$: Observable<number | null> = this._selectedBoxId$.asObservable();
   readonly options$: Observable<Option[]> = this.options.asObservable();
   readonly selectionHistory$: Observable<SelectionsMap> = this._selectionHistory.asObservable();
-  readonly totalPrice$: Observable<number> = this._totalPrice$.asObservable();
+  readonly totalPrice$: Observable<number> = this.selectionHistory$.pipe(
+    map((history) => {
+      const total = Object.values(history).reduce((sum, opt) => sum + (opt?.value || 0), 0);
+      return Math.round(total * 100) / 100;
+    }),
+  );
 
   selectBox(boxId: number) {
     this._selectedBoxId$.next(boxId);
@@ -44,14 +43,7 @@ export class BoxSelectionService {
     const updatedHistory = { ...currentHistory, [boxId]: option };
     this._selectionHistory.next(updatedHistory);
 
-    // update the total price whenever an option is selected
-    const totalPrice = Object.values(updatedHistory).reduce(
-      (sum, opt) => sum + (opt?.value || 0),
-      0,
-    );
-    const roundedTotal = Math.round(totalPrice * 100) / 100;
-    this._totalPrice$.next(roundedTotal);
-    saveToStorage(updatedHistory, roundedTotal);
+    saveToStorage(updatedHistory);
 
     // auto select the next box if exists
     const nextBoxId = boxId + 1;
@@ -87,6 +79,5 @@ export class BoxSelectionService {
     this._totalPrice$.next(0);
     this._selectedBoxId$.next(null);
     localStorage.removeItem('selection-history');
-    localStorage.removeItem('total-price');
   }
 }
