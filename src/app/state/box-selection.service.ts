@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { Option, SelectionsMap } from '../models/option.model';
-import { OPTION_LIST } from '../data/options.mock';
+import { OPTION_LIST } from '../data/options.data';
 
 const saveToStorage = (selections: SelectionsMap, totalPrice: number) => {
   localStorage.setItem('selection-history', JSON.stringify(selections));
