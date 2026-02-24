@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatestWith, map, Observable } from 'rxjs';
 import { Option, SelectionsMap } from '../models/option.model';
 import { OPTION_LIST } from '../data/options.data';
 
@@ -21,7 +21,6 @@ export class BoxSelectionService {
   private readonly _selectedBoxId$ = new BehaviorSubject<number | null>(null);
   private readonly _selectionHistory = new BehaviorSubject<SelectionsMap>(loadHistoryFromStorage());
   private readonly options = new BehaviorSubject<Option[]>(OPTION_LIST);
-  private readonly _totalPrice$ = new BehaviorSubject<number>(0);
 
   readonly selectedBoxId$: Observable<number | null> = this._selectedBoxId$.asObservable();
   readonly options$: Observable<Option[]> = this.options.asObservable();
@@ -33,12 +32,22 @@ export class BoxSelectionService {
     }),
   );
 
+  readonly selectedOptionIdForCurrentBox$: Observable<number | null> = this._selectedBoxId$.pipe(
+    combineLatestWith(this._selectionHistory),
+    map(([selectedBoxId, history]) => {
+      if (selectedBoxId === null) return null;
+      return history[selectedBoxId]?.id ?? null;
+    }),
+  );
+
   selectBox(boxId: number) {
     this._selectedBoxId$.next(boxId);
   }
 
-  selectOption(boxId: number, option: Option) {
+  selectOption(option: Option) {
     // save the new selection option
+    const boxId = this._selectedBoxId$.getValue();
+    if (boxId === null) return;
     const currentHistory = this._selectionHistory.getValue();
     const updatedHistory = { ...currentHistory, [boxId]: option };
     this._selectionHistory.next(updatedHistory);
@@ -67,7 +76,6 @@ export class BoxSelectionService {
 
   clearAllBoxes() {
     this._selectionHistory.next({});
-    this._totalPrice$.next(0);
     this._selectedBoxId$.next(null);
     localStorage.removeItem('selection-history');
   }

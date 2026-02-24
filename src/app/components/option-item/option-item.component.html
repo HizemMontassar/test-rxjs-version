@@ -1,0 +1,12 @@
+@let boxSelectedOptionId = boxSelectedOptionId$ | async;
+<button
+  [class]="
+    'w-full px-4 py-2 flex flex-col justify-center items-center rounded-lg cursor-pointer ' +
+    (boxSelectedOptionId === option.id
+      ? ' bg-violet-100 border-2 border-violet-300'
+      : ' border-gray-300 hover:bg-gray-200 border')
+  "
+>
+  <span>{{ option.label }}</span>
+  <span class="font-bold">${{ option.value }}</span>
+</button>
