@@ -56,15 +56,6 @@ export class BoxSelectionService {
     return this._selectedBoxId$.pipe(map((selectedBoxId) => selectedBoxId === boxId));
   }
 
-  isOptionSelected(boxId: number | null): Observable<boolean> {
-    if (boxId === null) {
-      return new BehaviorSubject<boolean>(false).asObservable();
-    }
-    return this._selectionHistory.pipe(
-      map((history) => history[boxId] !== undefined && history[boxId] !== null),
-    );
-  }
-
   getBoxSelectedOption(boxId: number): Observable<Option | null> {
     return this.selectionHistory$.pipe(
       map((history) => {
